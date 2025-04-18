@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Choose Your Own Lunch at LSC</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Choose Your Own Lunch at LSC</h1>
+  <div id="main-wrapper">
+    <section id="checklist-container">
+      <h2>🏑 Endings Checklist</h2>
+      <ul id="endings-checklist">
+        <li id="check-sitChaos">⬛ ???</li>
+        <li id="check-sitWindow">⬛ ???</li>
+        <li id="check-sitChaosA2">⬛ ???</li>
+        <li id="check-sitWindowA2">⬛ ???</li>
+        <li id="check-endFriend">⬛ ???</li>
+        <li id="check-endPeaceful">⬛ ???</li>
+        <li id="check-beerChaos">⬛ ???</li>
+        <li id="check-badEnding">⬛ ???</li>
+        <li id="check-panicEnding">⬛ ???</li>
+        <li id="check-crushSightingEnding">⬛ ???</li>
+        <li id="check-networkingEnding">⬛ ???</li>
+        <li id="check-existentialEnding">⬛ ???</li>
+      </ul>
+      <button id="reset-btn" onclick="resetProgress()">Reset All Progress</button>
+    </section>
+
+    <main id="story-container">
+      <img id="story-image" src="start.jpg" alt="Scene" />
+      <p id="story-text">You’re at the LSC. Food court or downstairs?</p>
+      <div>
+        <button class="arrow" id="left-button" onclick="goLeft()">Left</button>
+        <button class="arrow" id="right-button" onclick="goRight()">Right</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const endings = {
+      sitChaos: "Pretty Good Ending",
+      sitWindow: "Peaceful Ending",
+      sitChaosA2: "Good Ending",
+      sitWindowA2: "Good Friend Ending",
+      endFriend: "Good Friend Ending (Alt)",
+      endPeaceful: "Peaceful Ending (Downstairs)",
+      beerChaos: "Decent Ending",
+      badEnding: "Bad Ending",
+      panicEnding: "Embarrassing Ending",
+      crushSightingEnding: "Romantic Comedy Ending",
+      networkingEnding: "Career Win Ending",
+      existentialEnding: "Existential Ending"
+    };
+
+    const endingsReached = new Set(JSON.parse(localStorage.getItem("endingsReached")) || []);
+    let currentSceneKey = 'start';
+
+    const scenes = {
+      start: {
+        image: 'start.jpg',
+        text: 'You’re at the LSC. Will you go to the Food Court or go downstairs?',
+        left: 'friendFoodCourt',
+        right: 'friendDownstairs',
+        choiceTextLeft: 'Go to Food Court',
+        choiceTextRight: 'Go Downstairs'
+      },
+      friendFoodCourt: {
+        image: 'friend.jpg',
+        text: 'Your friend wants to eat somewhere else. What do you do?',
+        left: 'A2',
+        right: 'A1',
+        choiceTextLeft: 'Stick with friend',
+        choiceTextRight: 'Go get your own food'
+      },
+      friendDownstairs: {
+        image: 'friend.jpg',
+        text: 'Your friend wants to eat somewhere else. What do you do?',
+        left: 'A4',
+        right: 'A3',
+        choiceTextLeft: 'Stick with friend',
+        choiceTextRight: 'Go get your own food'
+      },
+      A1: {
+        image: 'foodcourt-options.jpg',
+        text: 'Pick your favorite food spot upstairs:',
+        left: 'panda',
+        right: 'freddys',
+        choiceTextLeft: 'Panda Express',
+        choiceTextRight: 'Freddy’s'
+      },
+      panda: {
+        image: 'panda.jpg',
+        text: 'You wait a long time in line and get Panda. Where do you sit?',
+        left: () => ['existentialEnding', 'sitChaos'][Math.floor(Math.random() * 2)],
+        right: 'sitWindow',
+        choiceTextLeft: 'Sit in the chaos',
+        choiceTextRight: 'Sit near the window'
+      },
+      freddys: {
+        image: 'freddys.jpg',
+        text: 'You get Freddy’s. Where do you sit?',
+        left: () => ['panicEnding', 'sitChaos'][Math.floor(Math.random() * 2)],
+        right: 'sitWindow',
+        choiceTextLeft: 'Sit in the chaos',
+        choiceTextRight: 'Sit near the window'
+      },
+      A2: {
+        image: 'panda.jpg',
+        text: 'You get Panda with your friend (even though you didn’t want it). Where do you sit?',
+        left: () => ['crushSightingEnding', 'sitChaosA2'][Math.floor(Math.random() * 2)],
+        right: () => ['networkingEnding', 'sitWindowA2'][Math.floor(Math.random() * 2)],
+        choiceTextLeft: 'Sit in the chaos',
+        choiceTextRight: 'Sit near the window'
+      },
+      A3: {
+        image: 'downstairs-options.jpg',
+        text: 'Pick your favorite food downstairs:',
+        left: 'wings',
+        right: 'tenders',
+        choiceTextLeft: 'Wings',
+        choiceTextRight: 'Tenders'
+      },
+      A4: {
+        image: 'ramskellar.jpg',
+        text: 'You and your friend go to Ramskellar. Get a beer?',
+        left: 'badEnding',
+        right: 'endFriend',
+        choiceTextLeft: 'Yes',
+        choiceTextRight: 'No'
+      },
+      wings: {
+        image: 'wings.jpg',
+        text: 'You grab wings. Beer or no beer?',
+        left: 'beerChaos',
+        right: 'endPeaceful',
+        choiceTextLeft: 'Beer me!',
+        choiceTextRight: 'Just eat my food'
+      },
+      tenders: {
+        image: 'tenders.jpg',
+        text: 'You grab tenders. Beer or no beer?',
+        left: 'beerChaos',
+        right: 'endPeaceful',
+        choiceTextLeft: 'Beer me!',
+        choiceTextRight: 'Just eat my food'
+      },
+      sitChaos: {
+        image: 'chaos.jpg',
+        text: 'You scan the crowded food court—every table’s full, voices echo off every wall. After a lap and some awkward hovering, you claim a wobbly corner seat between two strangers mid-debate about politics. It’s overwhelming… but somehow, it feels alive. Pretty Good Ending.',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'lightgreen'
+      },
+      sitWindow: {
+        image: 'window.jpg',
+        text: 'The window seat is calm. You people-watch and ponder if you’re the main character in someone else’s story. A bird lands nearby. Everything feels... paused. Peaceful Ending.',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'lightgreen'
+      },
+      sitChaosA2: {
+        image: 'chaos.jpg',
+        text: 'You and your friend make eye contact across the sea of backpacks and noise. After circling like vultures, you both dive onto a recently vacated table. It’s loud, messy, and oddly energizing. Shared chaos. Good Ending.',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'lightgreen'
+      },
+      sitWindowA2: {
+        image: 'window.jpg',
+        text: 'You and your friend settle by the window. Between bites, you fall into a surprisingly deep conversation about your futures. The chaos fades behind the glass. Good Friend Ending.',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'lightgreen'
+      },
+      beerChaos: {
+        image: 'beer.jpg',
+        text: 'You have a beer, then another. The world tilts slightly, and you’re giggling over fries. You miss class, but it feels worth it… for now. Decent Ending.',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'lightyellow'
+      },
+      badEnding: {
+        image: 'kickout.jpg',
+        text: 'You and your friend got too drunk; and are banned from Ramskellar. Bad Ending!',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'lightcoral'
+      },
+      endFriend: {
+        image: 'friend-lunch.jpg',
+        text: 'No drinks, just chill vibes. You and your friend catch up, reminisce, and plan your next move. Lunch turns into a heart-to-heart. Good Friend Ending',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'lightgreen'
+      },
+      endPeaceful: {
+        image: 'peaceful.jpg',
+        text: 'You eat, reflect, and make it to class on time. No chaos, no drama. Just a good meal and a calm mind. Peaceful Ending.',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'lightgreen'
+      },
+      panicEnding: {
+        image: 'panic.jpg',
+        text: 'Bag slips. Water splashes. A collective gasp. You shuffle away, red-faced and drenched in water. Embarrassing Ending.',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'orange'
+      },
+      crushSightingEnding: {
+        image: 'crush.jpg',
+        text: 'You spot your crush. They see you. A smile, maybe even a wave. Is this fate or just lunch? Either way, you’re riding that high all day. Romantic Comedy Ending.',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'pink'
+      },
+      networkingEnding: {
+        image: 'resume.jpg',
+        text: 'You sit next to your professor—turns out they’re looking for a research assistant. Your lunch turns into an impromptu pitch. Career Win Ending.',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'lightblue'
+      },
+      existentialEnding: {
+        image: 'void.jpg',
+        text: 'The line was eternal. You sit down, food in hand, and stare into space. You wonder if you’re hungry... or just existing. Existential Ending.',
+        left: 'restart',
+        right: 'restart',
+        choiceTextLeft: 'Restart',
+        choiceTextRight: 'Restart',
+        bgColor: 'lightgrey'
+      },
+      restart: {
+        image: 'start.jpg',
+        text: 'Back at the LSC. Ready to try again?',
+        left: 'friendFoodCourt',
+        right: 'friendDownstairs',
+        choiceTextLeft: 'Go to Food Court',
+        choiceTextRight: 'Go Downstairs'
+      }
+    };
+
+    function checkEnding(sceneName) {
+      if (endings[sceneName] && !endingsReached.has(sceneName)) {
+        endingsReached.add(sceneName);
+        localStorage.setItem("endingsReached", JSON.stringify([...endingsReached]));
+      }
+
+      for (let key in endings) {
+        const item = document.getElementById(`check-${key}`);
+        if (item) {
+          item.innerText = endingsReached.has(key)
+            ? `✅ ${endings[key]}`
+            : `⬛ ???`;
+        }
+      }
+    }
+
+    function updateScene() {
+      const scene = scenes[currentSceneKey];
+      document.getElementById('story-image').src = scene.image;
+      document.getElementById('story-text').innerText = scene.text;
+      document.getElementById('left-button').innerText = scene.choiceTextLeft || 'Restart';
+      document.getElementById('right-button').innerText = scene.choiceTextRight || 'Restart';
+      document.getElementById('story-container').style.backgroundColor = scene.bgColor || 'white';
+
+      if (scene.left === scene.right) {
+        document.getElementById('right-button').style.display = 'none';
+        document.getElementById('left-button').style.margin = '0 auto';
+      } else {
+        document.getElementById('right-button').style.display = 'inline-block';
+        document.getElementById('left-button').style.margin = '';
+      }
+
+      checkEnding(currentSceneKey);
+    }
+
+    function loadScene(nextKey) {
+      currentSceneKey = nextKey;
+      updateScene();
+    }
+
+    function goLeft() {
+      const scene = scenes[currentSceneKey];
+      const nextKey = typeof scene.left === 'function' ? scene.left() : scene.left;
+      loadScene(nextKey);
+    }
+
+    function goRight() {
+      const scene = scenes[currentSceneKey];
+      const nextKey = typeof scene.right === 'function' ? scene.right() : scene.right;
+      loadScene(nextKey);
+    }
+
+    function resetProgress() {
+      localStorage.removeItem("endingsReached");
+      localStorage.removeItem("replayMessageShown");
+      endingsReached.clear();
+      currentSceneKey = 'start';
+      updateScene();
+    }
+
+    // Pop-up to explain multiple endings
+    if (!localStorage.getItem("replayMessageShown")) {
+      alert("Welcome to 'Choose Your Own Lunch at LSC'! 🎲\n\nSome paths lead to different endings even if you make the same choices. Try replaying to discover them all!");
+      localStorage.setItem("replayMessageShown", "true");
+    }
+
+    window.goLeft = goLeft;
+    window.goRight = goRight;
+    window.resetProgress = resetProgress;
+
+    updateScene();
+  </script>
+</body>
+</html>

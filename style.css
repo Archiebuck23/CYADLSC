@@ -1,0 +1,127 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #f2f2f2, #e0eafc);
+  color: #333;
+  overflow: hidden;
+}
+
+h1 {
+  background-color: #6b8e23;
+  color: white;
+  margin: 0;
+  padding: 16px;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+#main-wrapper {
+  display: flex;
+  flex-direction: row;
+  height: calc(100% - 70px);
+  padding: 10px;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+#checklist-container {
+  width: 230px;
+  padding: 10px;
+  background: #f0f8ff;
+  border-radius: 10px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+
+#endings-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+}
+
+#endings-checklist li {
+  margin-bottom: 4px;
+  font-family: sans-serif;
+}
+
+#reset-btn {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  background: lightgray;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#reset-btn:hover {
+  background: #ddd;
+}
+
+#story-container {
+  flex: 1;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#story-image {
+  max-height: 450px;
+  width: auto;
+  border-radius: 10px;
+  margin: 0 auto 10px auto;
+  object-fit: contain;
+}
+
+#story-text {
+  font-size: 1.1rem;
+  margin: 10px 0;
+}
+
+#story-container > div {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.arrow {
+  font-size: 0.9rem;
+  padding: 10px 20px;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.arrow:hover {
+  background: linear-gradient(to right, #4e54c8, #8f94fb);
+  transform: translateY(-2px);
+}
+
+@media screen and (max-width: 768px) {
+  #main-wrapper {
+    flex-direction: column;
+    height: auto;
+    overflow: auto;
+  }
+
+  #checklist-container {
+    width: 100%;
+    max-height: 200px;
+  }
+
+  #story-image {
+    max-height: 150px;
+  }
+
+  .arrow {
+    width: 45%;
+    margin: 0 auto;
+  }
+}
